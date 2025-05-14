@@ -1,5 +1,5 @@
 # build the app
-FROM golang:latest as build
+FROM golang:latest AS build
 
 ARG Version=0.4.0
 

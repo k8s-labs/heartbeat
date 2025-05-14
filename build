@@ -1,0 +1,12 @@
+#!/bin/bash
+
+docker build . -t ghcr.io/k8s-labs/heartbeat:0.5.0
+
+docker build . -t ghcr.io/k8s-labs/pos:0.5.0 -f pos.dockerfile
+docker build . -t ghcr.io/k8s-labs/make-line:0.5.0 -f make-line.dockerfile
+docker build . -t ghcr.io/k8s-labs/timecard:0.5.0 -f timecard.dockerfile
+
+docker push ghcr.io/k8s-labs/heartbeat:0.5.0
+docker push ghcr.io/k8s-labs/pos:0.5.0
+docker push ghcr.io/k8s-labs/make-line:0.5.0
+docker push ghcr.io/k8s-labs/timecard:0.5.0
