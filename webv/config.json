@@ -1,0 +1,13 @@
+{
+  "requests":
+  [
+    {"path":"/config/1048577","validation":{"statusCode":400}},
+    {"path":"/config/0","validation":{"statusCode":400}},
+    {"path":"/config/version","validation":{"contentType":"text/plain"}},
+    {"path":"/config/healthz","validation":{"contentType":"text/plain"}},
+    {"path":"/config/readyz","validation":{"contentType":"text/plain"}},
+    {"path":"/config/1024","validation":{"contentType":"text/plain"}},
+    {"path":"/config/65536","validation":{"contentType":"text/plain"}},
+    {"path":"/config", "validation":{"contentType":"text/html"}}
+  ]
+}

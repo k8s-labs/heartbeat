@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Default deployment for the config app (version 0.4.0).
+# Apply with: kubectl apply -k deploy/config
+# Override with overlays/0.5.0 or overlays/0.6.0.
+resources:
+  - overlays/0.4.0

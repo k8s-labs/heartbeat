@@ -3,3 +3,4 @@ pos	Point of Sale
 make-line	Make Line
 timecard	Timecard
 beverage-buzz	Beverage Buzz
+config	Configuration
