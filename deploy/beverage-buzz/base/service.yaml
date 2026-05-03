@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: beverage-buzz
+  namespace: beverage-buzz
+  labels:
+    app: beverage-buzz
+spec:
+  type: ClusterIP
+  selector:
+    app: beverage-buzz
+  ports:
+    - port: 8080
+      targetPort: 8080

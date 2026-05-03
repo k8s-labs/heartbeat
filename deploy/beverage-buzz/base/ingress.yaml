@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: beverage-buzz
+  namespace: beverage-buzz
+  labels:
+    app: beverage-buzz
+spec:
+  ingressClassName: traefik
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: beverage-buzz
+                port:
+                  number: 8080

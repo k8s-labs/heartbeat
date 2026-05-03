@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: beverage-buzz
+  namespace: beverage-buzz
+  labels:
+    app: beverage-buzz
+spec:
+  containers:
+  - name: app
+    imagePullPolicy: IfNotPresent
+    image: docker.io/library/beverage-buzz:0.4.0
+    args:
+      - --log
+    env:
+      - name: URI
+        value: /
+    ports:
+    - name: http
+      containerPort: 8080
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: http
+      initialDelaySeconds: 5
+      failureThreshold: 10
+      periodSeconds: 60
+    startupProbe:
+      httpGet:
+        path: /readyz
+        port: http
+      initialDelaySeconds: 5
+      failureThreshold: 60
+      periodSeconds: 2
+    resources:
+      limits:
+        memory: 128Mi
+        cpu: 200m
+      requests:
+        memory: 64Mi
+        cpu: 100m
