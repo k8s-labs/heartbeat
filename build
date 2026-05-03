@@ -1,12 +1,44 @@
 #!/bin/bash
+set -euo pipefail
 
-docker build . -t ghcr.io/k8s-labs/heartbeat:0.5.0
+# Build all apps × versions as static Go binaries, package each into a scratch
+# image, and import into the local k3s containerd. Manifests:
+#   apps.tsv      <slug>\t<title>
+#   versions.txt  one version per line
 
-docker build . -t ghcr.io/k8s-labs/pos:0.5.0 -f pos.dockerfile
-docker build . -t ghcr.io/k8s-labs/make-line:0.5.0 -f make-line.dockerfile
-docker build . -t ghcr.io/k8s-labs/timecard:0.5.0 -f timecard.dockerfile
+cd "$(dirname "$0")"
 
-docker push ghcr.io/k8s-labs/heartbeat:0.5.0
-docker push ghcr.io/k8s-labs/pos:0.5.0
-docker push ghcr.io/k8s-labs/make-line:0.5.0
-docker push ghcr.io/k8s-labs/timecard:0.5.0
+mkdir -p bin
+
+# 1. Native compile: one binary per (slug, version) -- much faster than
+#    running golang:latest in Docker for every build.
+while IFS=$'\t' read -r slug title; do
+    [[ -z "$slug" || "$slug" == \#* ]] && continue
+    while read -r version; do
+        [[ -z "$version" || "$version" == \#* ]] && continue
+        out="bin/${slug}-${version}"
+        echo "==> go build ${out}  (Title=${title})"
+        CGO_ENABLED=0 GOOS=linux go build \
+            -ldflags="-X main.Version=${version} -X 'main.Title=${title}'" \
+            -a -installsuffix cgo \
+            -o "${out}" ./cmd/heartbeat
+    done < versions.txt
+done < apps.tsv
+
+# 2. Package + import: one image per (slug, version)
+while IFS=$'\t' read -r slug title; do
+    [[ -z "$slug" || "$slug" == \#* ]] && continue
+    while read -r version; do
+        [[ -z "$version" || "$version" == \#* ]] && continue
+        image="${slug}:${version}"
+        echo "==> docker build ${image}"
+        docker build . -f Dockerfile.app \
+            --build-arg Slug="${slug}" \
+            --build-arg BIN="bin/${slug}-${version}" \
+            -t "${image}"
+        docker save "${image}" | sudo k3s ctr images import -
+    done < versions.txt
+done < apps.tsv
+
+echo "==> Imported images:"
+sudo k3s ctr images ls | grep -E "$(cut -f1 apps.tsv | paste -sd'|' -)" || true

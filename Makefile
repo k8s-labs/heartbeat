@@ -16,17 +16,21 @@ all : docker run test
 
 linux :
 	# Building Linux binary
-	@CGO_ENABLED=0 GOOS=linux go build -ldflags="-X main.Version=0.3.0" -o bin/heartbeat -a src/main.go
+	@CGO_ENABLED=0 GOOS=linux go build -ldflags="-X main.Version=0.3.0" -o bin/heartbeat -a ./cmd/heartbeat
 
 windows :
 	# Building Windows binary
-	@CGO_ENABLED=0 GOOS=windows go build -ldflags="-X main.Version=0.3.0" -o bin/heartbeat.exe -a src/main.go
+	@CGO_ENABLED=0 GOOS=windows go build -ldflags="-X main.Version=0.3.0" -o bin/heartbeat.exe -a ./cmd/heartbeat
 
 docker :
-	docker build . -t heartbeat
+	@./build
+
+pos :
+	CGO_ENABLED=0 GOOS=linux go build -ldflags="-X main.Version=0.4.0 -X main.Title=POS" -o bin/pos-0.4.0 ./cmd/heartbeat
+	docker build . -f Dockerfile.app --build-arg Slug=pos --build-arg BIN=bin/pos-0.4.0 -t pos:0.4.0
 
 run :
-	docker run -d --rm --name heartbeat -p 8080:8080 heartbeat
+	docker run -d --rm --name heartbeat -p 8080:8080 heartbeat:0.4.0
 	docker logs heartbeat
 
 test :

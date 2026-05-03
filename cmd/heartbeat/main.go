@@ -12,8 +12,11 @@ import (
 	"time"
 )
 
+// Version and Title get set in the build / dockerfile
+var Version = "0.4.0"
+var Title = "Heartbeat"
+
 // default values
-var title = "Heartbeat"
 var uri = "/heartbeat"
 var root = "/"
 var port = 8080
@@ -22,9 +25,6 @@ var minSize = 1
 var maxSize = 1024 * 1024
 var bufferSize = 1
 var logResults = false
-
-// version gets set in the build / dockerfile
-var Version = "0.4.0"
 
 // main app
 func main() {
@@ -79,7 +79,7 @@ func parseCommandLine() {
 	}
 
 	if s := os.Getenv("TITLE"); s != "" {
-		title = s
+		Title = s
 	}
 
 	// parse flags
@@ -177,7 +177,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	html := getTemplate()
 
 	html = strings.Replace(html, "{{uri}}", uri, -1)
-	html = strings.Replace(html, "{{title}}", title, -1)
+	html = strings.Replace(html, "{{title}}", Title, -1)
 	html = strings.Replace(html, "{{table}}", strings.TrimRight(table, "\n"), -1)
 
 	fmt.Fprintln(w, html)

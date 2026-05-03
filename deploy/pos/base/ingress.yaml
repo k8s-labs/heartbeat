@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pos
+  namespace: pos
+  labels:
+    app: pos
+spec:
+  ingressClassName: traefik
+  rules:
+    - http:
+        paths:
+          - path: /pos
+            pathType: Prefix
+            backend:
+              service:
+                name: pos
+                port:
+                  number: 8080

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: timecard
+  namespace: timecard
+  labels:
+    app: timecard
+spec:
+  type: ClusterIP
+  selector:
+    app: timecard
+  ports:
+    - port: 8080
+      targetPort: 8080
