@@ -1,0 +1,13 @@
+{
+  "requests":
+  [
+    {"path":"/1048577","validation":{"statusCode":400}},
+    {"path":"/0","validation":{"statusCode":400}},
+    {"path":"/version","validation":{"contentType":"text/plain"}},
+    {"path":"/healthz","validation":{"contentType":"text/plain"}},
+    {"path":"/readyz","validation":{"contentType":"text/plain"}},
+    {"path":"/1024","validation":{"contentType":"text/plain"}},
+    {"path":"/65536","validation":{"contentType":"text/plain"}},
+    {"path":"/", "validation":{"contentType":"text/html"}}
+  ]
+}

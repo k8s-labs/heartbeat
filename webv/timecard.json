@@ -1,0 +1,13 @@
+{
+  "requests":
+  [
+    {"path":"/timecard/1048577","validation":{"statusCode":400}},
+    {"path":"/timecard/0","validation":{"statusCode":400}},
+    {"path":"/timecard/version","validation":{"contentType":"text/plain"}},
+    {"path":"/timecard/healthz","validation":{"contentType":"text/plain"}},
+    {"path":"/timecard/readyz","validation":{"contentType":"text/plain"}},
+    {"path":"/timecard/1024","validation":{"contentType":"text/plain"}},
+    {"path":"/timecard/65536","validation":{"contentType":"text/plain"}},
+    {"path":"/timecard", "validation":{"contentType":"text/html"}}
+  ]
+}

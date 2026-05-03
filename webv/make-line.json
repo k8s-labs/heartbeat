@@ -1,0 +1,13 @@
+{
+  "requests":
+  [
+    {"path":"/make-line/1048577","validation":{"statusCode":400}},
+    {"path":"/make-line/0","validation":{"statusCode":400}},
+    {"path":"/make-line/version","validation":{"contentType":"text/plain"}},
+    {"path":"/make-line/healthz","validation":{"contentType":"text/plain"}},
+    {"path":"/make-line/readyz","validation":{"contentType":"text/plain"}},
+    {"path":"/make-line/1024","validation":{"contentType":"text/plain"}},
+    {"path":"/make-line/65536","validation":{"contentType":"text/plain"}},
+    {"path":"/make-line", "validation":{"contentType":"text/html"}}
+  ]
+}
