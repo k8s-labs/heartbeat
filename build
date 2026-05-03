@@ -5,10 +5,21 @@ set -euo pipefail
 # image, and import into the local k3s containerd. Manifests:
 #   apps.tsv      <slug>\t<title>
 #   versions.txt  one version per line
+#
+# Each (slug, version) is skipped if its binary already exists in bin/ AND
+# is newer than the source. Pass --force to rebuild everything.
 
 cd "$(dirname "$0")"
 
-mkdir -p bin
+force=0
+[[ "${1:-}" == "--force" || "${1:-}" == "-f" ]] && force=1
+
+mkdir -p bin bin/.imported
+
+src_files=(cmd/heartbeat/main.go go.mod)
+
+# Cache: list of images already imported into k3s containerd
+existing_images="$(sudo k3s ctr images ls -q 2>/dev/null || true)"
 
 # 1. Native compile: one binary per (slug, version) -- much faster than
 #    running golang:latest in Docker for every build.
@@ -17,6 +28,18 @@ while IFS=$'\t' read -r slug title; do
     while read -r version; do
         [[ -z "$version" || "$version" == \#* ]] && continue
         out="bin/${slug}-${version}"
+
+        if [[ $force -eq 0 && -f "$out" ]]; then
+            stale=0
+            for s in "${src_files[@]}"; do
+                [[ "$s" -nt "$out" ]] && stale=1 && break
+            done
+            if [[ $stale -eq 0 ]]; then
+                echo "==> skip ${out} (up to date)"
+                continue
+            fi
+        fi
+
         echo "==> go build ${out}  (Title=${title})"
         CGO_ENABLED=0 GOOS=linux go build \
             -ldflags="-X main.Version=${version} -X 'main.Title=${title}'" \
@@ -31,12 +54,24 @@ while IFS=$'\t' read -r slug title; do
     while read -r version; do
         [[ -z "$version" || "$version" == \#* ]] && continue
         image="${slug}:${version}"
+        bin="bin/${slug}-${version}"
+        stamp="bin/.imported/${slug}-${version}"
+        ref="docker.io/library/${image}"
+
+        if [[ $force -eq 0 ]] \
+            && grep -qx "$ref" <<<"$existing_images" \
+            && [[ -f "$stamp" && ! "$bin" -nt "$stamp" ]]; then
+            echo "==> skip ${image} (already imported, binary unchanged)"
+            continue
+        fi
+
         echo "==> docker build ${image}"
         docker build . -f Dockerfile.app \
             --build-arg Slug="${slug}" \
-            --build-arg BIN="bin/${slug}-${version}" \
+            --build-arg BIN="${bin}" \
             -t "${image}"
         docker save "${image}" | sudo k3s ctr images import -
+        touch "$stamp"
     done < versions.txt
 done < apps.tsv
 
