@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: heartbeat
+  namespace: heartbeat
+  labels:
+    app: heartbeat
+spec:
+  type: ClusterIP
+  selector:
+    app: heartbeat
+  ports:
+    - port: 8080
+      targetPort: 8080
